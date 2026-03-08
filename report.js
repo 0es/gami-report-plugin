@@ -191,16 +191,11 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
     </tr>`).join('');
 
   // Chart series — null values render as gaps in ECharts line/bar charts
-  const xData            = JSON.stringify(allIds);
-  const totalUserSeries  = JSON.stringify(userData.map(r => cv(r.totalUserNum, 0)));
-  const newUserSeries    = JSON.stringify(userData.map(r => cv(r.newRegisterUserNum, 0)));
-  const activeUserSeries = JSON.stringify(userData.map(r => cv(r.activeUserNum, 0)));
-  const orderAmtSeries   = JSON.stringify(orderData.map(r => cv(r.totalAmount)));
-  const orderCntSeries   = JSON.stringify(orderData.map(r => cv(r.orderCount, 0)));
-  const avgAmtSeries     = JSON.stringify(orderData.map(r => cv(r.avgAmountPerBuyer)));
-  const repeatRateSeries = JSON.stringify(orderData.map(r => cpct(r.repeatRate)));
-  const totalPMSeries    = JSON.stringify(playmateData.map(r => cv(r.totalPlaymateNum, 0)));
-  const acceptRateSeries = JSON.stringify(playmateData.map(r => cpct(r.acceptOrderRate)));
+  const xData              = JSON.stringify(allIds);
+  const orderAmtSeries     = JSON.stringify(orderData.map(r => cv(r.totalAmount)));
+  const avgAmtSeries       = JSON.stringify(orderData.map(r => cv(r.avgAmountPerBuyer)));
+  const totalBuyersSeries  = JSON.stringify(orderData.map(r => cv(r.totalBuyers, 0)));
+  const repeatRateSeries   = JSON.stringify(orderData.map(r => cpct(r.repeatRate)));
 
   return `<!DOCTYPE html>
 <html>
@@ -248,14 +243,15 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
     tbody tr:nth-child(even) td { background: #f8f9ff; }
     tbody tr:hover td { background: #e8f0fe; }
     .charts-grid {
-      display: grid; grid-template-columns: 1fr 1fr;
-      gap: 20px; margin-bottom: 28px;
+      display: flex; flex-direction: column;
+      gap: 30px; margin-bottom: 28px;
     }
     .chart-card {
       background: #fff; border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08); padding: 20px;
+      box-sizing: border-box;
     }
-    .chart-box { width: 100%; height: 300px; }
+    .chart-box { width: 100%; height: 400px; }
     .footer { text-align: center; color: #999; font-size: 11px; margin-top: 16px; }
   </style>
 </head>
@@ -266,10 +262,8 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
   </div>
 
   <div class="charts-grid">
-    <div class="chart-card"><div id="chart-user" class="chart-box"></div></div>
-    <div class="chart-card"><div id="chart-order-amount" class="chart-box"></div></div>
-    <div class="chart-card"><div id="chart-order-rate" class="chart-box"></div></div>
-    <div class="chart-card"><div id="chart-playmate" class="chart-box"></div></div>
+    <div class="chart-card"><div id="chart1" class="chart-box"></div></div>
+    <div class="chart-card"><div id="chart2" class="chart-box"></div></div>
   </div>
 
   <div class="section">
@@ -318,69 +312,38 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
   <script>
     const xData = ${xData};
 
-    const baseChartOpt = {
+    const chart1 = echarts.init(document.getElementById('chart1'));
+    chart1.setOption({
+      title: { text: '下单金额情况', left: 'center' },
       tooltip: { trigger: 'axis' },
-      grid: { top: 50, bottom: 55, left: 65, right: 65 },
-      xAxis: { type: 'category', data: xData, axisLabel: { fontSize: 10, rotate: 30, interval: 0 } },
-    };
-
-    // Chart 1: User Growth
-    echarts.init(document.getElementById('chart-user')).setOption({
-      ...baseChartOpt,
-      title: { text: '用户增长趋势', left: 'center', textStyle: { fontSize: 13 } },
-      legend: { data: ['总用户数', '新注册用户', '活跃用户'], bottom: 0, textStyle: { fontSize: 11 } },
-      yAxis: { type: 'value', name: '人数', nameTextStyle: { fontSize: 10 } },
-      series: [
-        { name: '总用户数',  type: 'line', data: ${totalUserSeries},  smooth: true, symbolSize: 5, lineStyle: { width: 2 }, connectNulls: false, label: { show: true, fontSize: 9 } },
-        { name: '新注册用户', type: 'bar',  data: ${newUserSeries},    itemStyle: { color: '#34a853' }, label: { show: true, position: 'top', fontSize: 9 } },
-        { name: '活跃用户',  type: 'line', data: ${activeUserSeries}, smooth: true, symbolSize: 5, lineStyle: { width: 2, type: 'dashed' }, connectNulls: false, label: { show: true, fontSize: 9 } },
+      legend: { data: ['订单金额', '人均下单金额'], bottom: 0 },
+      grid: { top: 60, bottom: 60 },
+      xAxis: { type: 'category', data: xData },
+      yAxis: [
+        { type: 'value', name: '金额', axisLabel: { formatter: '¥{value}' } },
+        { type: 'value', name: '人均', axisLabel: { formatter: '¥{value}' } }
       ],
+      series: [
+        { name: '订单金额', type: 'bar', data: ${orderAmtSeries}, itemStyle: { color: '#007bff' }, label: { show: true, position: 'top', formatter: '¥{c}' } },
+        { name: '人均下单金额', type: 'line', yAxisIndex: 1, data: ${avgAmtSeries}, itemStyle: { color: '#ff7f50' }, symbolSize: 8, lineStyle: { width: 3 }, label: { show: true, position: 'bottom', formatter: '¥{c}' } }
+      ]
     });
 
-    // Chart 2: Order Amount
-    echarts.init(document.getElementById('chart-order-amount')).setOption({
-      ...baseChartOpt,
-      title: { text: '订单金额趋势', left: 'center', textStyle: { fontSize: 13 } },
-      legend: { data: ['订单总金额', '人均下单金额'], bottom: 0, textStyle: { fontSize: 11 } },
+    const chart2 = echarts.init(document.getElementById('chart2'));
+    chart2.setOption({
+      title: { text: '下单用户情况', left: 'center' },
+      tooltip: { trigger: 'axis' },
+      legend: { data: ['下单用户数', '复购率'], bottom: 0 },
+      grid: { top: 60, bottom: 60 },
+      xAxis: { type: 'category', data: xData },
       yAxis: [
-        { type: 'value', name: '总金额', nameTextStyle: { fontSize: 10 }, axisLabel: { fontSize: 9 } },
-        { type: 'value', name: '人均',   nameTextStyle: { fontSize: 10 }, axisLabel: { fontSize: 9 } },
+        { type: 'value', name: '人数' },
+        { type: 'value', name: '率', axisLabel: { formatter: '{value}%' } }
       ],
       series: [
-        { name: '订单总金额',  type: 'bar',  data: ${orderAmtSeries}, itemStyle: { color: '#1a73e8' }, label: { show: true, position: 'top', fontSize: 9 } },
-        { name: '人均下单金额', type: 'line', yAxisIndex: 1, data: ${avgAmtSeries}, smooth: true, symbolSize: 5, itemStyle: { color: '#ff6d00' }, lineStyle: { width: 2 }, connectNulls: false, label: { show: true, fontSize: 9 } },
-      ],
-    });
-
-    // Chart 3: Order Count + Repurchase Rate
-    echarts.init(document.getElementById('chart-order-rate')).setOption({
-      ...baseChartOpt,
-      title: { text: '订单量与复购率趋势', left: 'center', textStyle: { fontSize: 13 } },
-      legend: { data: ['订单数', '复购率(%)'], bottom: 0, textStyle: { fontSize: 11 } },
-      tooltip: { trigger: 'axis', formatter: function(p) { return p.map(i => i.marker + i.seriesName + ': ' + (i.value == null ? '-' : i.seriesName === '订单数' ? i.value : i.value + '%')).join('<br/>'); } },
-      yAxis: [
-        { type: 'value', name: '订单数',    nameTextStyle: { fontSize: 10 } },
-        { type: 'value', name: '复购率(%)', nameTextStyle: { fontSize: 10 }, axisLabel: { formatter: '{value}%', fontSize: 9 } },
-      ],
-      series: [
-        { name: '订单数',   type: 'bar',  data: ${orderCntSeries},   itemStyle: { color: '#34a853' }, label: { show: true, position: 'top', fontSize: 9 } },
-        { name: '复购率(%)', type: 'line', yAxisIndex: 1, data: ${repeatRateSeries}, smooth: true, symbolSize: 5, itemStyle: { color: '#ea4335' }, lineStyle: { width: 2 }, connectNulls: false, label: { show: true, fontSize: 9, formatter: '{c}%' } },
-      ],
-    });
-
-    // Chart 4: Playmate Stats
-    echarts.init(document.getElementById('chart-playmate')).setOption({
-      ...baseChartOpt,
-      title: { text: '陪玩师数据趋势', left: 'center', textStyle: { fontSize: 13 } },
-      legend: { data: ['陪玩师总数', '接单率(%)'], bottom: 0, textStyle: { fontSize: 11 } },
-      yAxis: [
-        { type: 'value', name: '人数',      nameTextStyle: { fontSize: 10 } },
-        { type: 'value', name: '接单率(%)', nameTextStyle: { fontSize: 10 }, axisLabel: { formatter: '{value}%', fontSize: 9 } },
-      ],
-      series: [
-        { name: '陪玩师总数', type: 'bar',  data: ${totalPMSeries},    itemStyle: { color: '#9c27b0' }, label: { show: true, position: 'top', fontSize: 9 } },
-        { name: '接单率(%)',  type: 'line', yAxisIndex: 1, data: ${acceptRateSeries}, smooth: true, symbolSize: 5, itemStyle: { color: '#ff9800' }, lineStyle: { width: 2 }, connectNulls: false, label: { show: true, fontSize: 9, formatter: '{c}%' } },
-      ],
+        { name: '下单用户数', type: 'bar', data: ${totalBuyersSeries}, itemStyle: { color: '#28a745' }, label: { show: true, position: 'top' } },
+        { name: '复购率', type: 'line', yAxisIndex: 1, data: ${repeatRateSeries}, itemStyle: { color: '#dc3545' }, symbolSize: 8, lineStyle: { width: 3 }, label: { show: true, position: 'right', formatter: '{c}%' } }
+      ]
     });
   </script>
 </body>
