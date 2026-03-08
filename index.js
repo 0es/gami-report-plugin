@@ -5,8 +5,8 @@ const { generateReport } = require('./report');
 const DEFAULT_API_KEY = 'api_key';
 
 const BASE_URLS = {
-  test: 'https://test-op.gami.vip',
-  prod: 'https://op.gami.vip',
+  test: 'https://test-op-api.gami.vip',
+  prod: 'https://op-api.gami.vip',
 };
 
 /**
