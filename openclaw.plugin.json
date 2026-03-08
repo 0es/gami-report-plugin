@@ -1,0 +1,34 @@
+{
+  "name": "gami-report",
+  "openclaw": {
+    "extensions": ["./index.js"],
+    "skills": ["./skills"]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {
+      "apiKey": {
+        "type": "string",
+        "description": "X-API-Key for the Gami inner API"
+      },
+      "env": {
+        "type": "string",
+        "enum": ["test", "prod"],
+        "default": "prod",
+        "description": "API environment: 'test' uses test-op.gami.vip, 'prod' uses op.gami.vip"
+      }
+    }
+  },
+  "uiHints": {
+    "apiKey": {
+      "label": "API Key",
+      "sensitive": true,
+      "placeholder": "api_key"
+    },
+    "env": {
+      "label": "Environment",
+      "placeholder": "prod"
+    }
+  }
+}

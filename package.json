@@ -1,0 +1,17 @@
+{
+  "name": "gami-report",
+  "version": "1.0.0",
+  "description": "OpenClaw plugin for generating Gami platform statistical report images",
+  "main": "index.js",
+  "openclaw": {
+    "extensions": [
+      "./index.js"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
+  "dependencies": {
+    "puppeteer": "^24.38.0"
+  }
+}
