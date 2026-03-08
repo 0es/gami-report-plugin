@@ -164,7 +164,7 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
   const orderRows = orderData.map(r => `
     <tr>
       <td>${r.id}</td>
-      <td>${r.totalAmount != null ? '¥' + num(r.totalAmount) : '-'}</td>
+      <td>${num(r.totalAmount)}</td>
       <td>${num(r.orderCount)}</td>
       <td>${num(r.statusOkCount)}</td>
       <td>${num(r.statusRefundCount)}</td>
@@ -172,7 +172,7 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
       <td>${num(r.totalBuyers)}</td>
       <td>${num(r.completedBuyers)}</td>
       <td>${num(r.repeatCompletedBuyers)}</td>
-      <td>${r.avgAmountPerBuyer != null ? '¥' + num(r.avgAmountPerBuyer) : '-'}</td>
+      <td>${num(r.avgAmountPerBuyer)}</td>
       <td>${pct(r.repeatRate)}</td>
       <td>${pct(r.successRate)}</td>
       <td>${pct(r.refundRate)}</td>
@@ -185,9 +185,9 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
       <td>${num(r.newPlaymateNum)}</td>
       <td>${num(r.activePlaymateNum)}</td>
       <td>${num(r.acceptOrderPlaymateNum)}</td>
-      <td>${r.totalOrderAmount != null ? '¥' + num(r.totalOrderAmount) : '-'}</td>
+      <td>${num(r.totalOrderAmount)}</td>
       <td>${pct(r.acceptOrderRate)}</td>
-      <td>${r.avgAmountAcceptOrder != null ? '¥' + num(r.avgAmountAcceptOrder) : '-'}</td>
+      <td>${num(r.avgAmountAcceptOrder)}</td>
     </tr>`).join('');
 
   // Chart series — null values render as gaps in ECharts line/bar charts
@@ -343,12 +343,12 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
       title: { text: '订单金额趋势', left: 'center', textStyle: { fontSize: 13 } },
       legend: { data: ['订单总金额', '人均下单金额'], bottom: 0, textStyle: { fontSize: 11 } },
       yAxis: [
-        { type: 'value', name: '总金额(¥)', nameTextStyle: { fontSize: 10 }, axisLabel: { formatter: '¥{value}', fontSize: 9 } },
-        { type: 'value', name: '人均(¥)',   nameTextStyle: { fontSize: 10 }, axisLabel: { formatter: '¥{value}', fontSize: 9 } },
+        { type: 'value', name: '总金额', nameTextStyle: { fontSize: 10 }, axisLabel: { fontSize: 9 } },
+        { type: 'value', name: '人均',   nameTextStyle: { fontSize: 10 }, axisLabel: { fontSize: 9 } },
       ],
       series: [
-        { name: '订单总金额',  type: 'bar',  data: ${orderAmtSeries}, itemStyle: { color: '#1a73e8' }, label: { show: true, position: 'top', formatter: '¥{c}', fontSize: 9 } },
-        { name: '人均下单金额', type: 'line', yAxisIndex: 1, data: ${avgAmtSeries}, smooth: true, symbolSize: 5, itemStyle: { color: '#ff6d00' }, lineStyle: { width: 2 }, connectNulls: false, label: { show: true, fontSize: 9, formatter: '¥{c}' } },
+        { name: '订单总金额',  type: 'bar',  data: ${orderAmtSeries}, itemStyle: { color: '#1a73e8' }, label: { show: true, position: 'top', fontSize: 9 } },
+        { name: '人均下单金额', type: 'line', yAxisIndex: 1, data: ${avgAmtSeries}, smooth: true, symbolSize: 5, itemStyle: { color: '#ff6d00' }, lineStyle: { width: 2 }, connectNulls: false, label: { show: true, fontSize: 9 } },
       ],
     });
 
