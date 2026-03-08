@@ -393,7 +393,7 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
  * Generate a report image from the provided raw API data.
  * @returns {Promise<string>} Absolute path to the generated PNG
  */
-async function generateReport({ reportType, startDay, endDay, userData, orderData, playmateData }) {
+async function generateReport({ reportType, startDay, endDay, userData, orderData, playmateData, outDir: customOutDir }) {
   // 1. Build complete ascending period list
   const allIds = generatePeriodIds(reportType, startDay, endDay);
 
@@ -410,7 +410,7 @@ async function generateReport({ reportType, startDay, endDay, userData, orderDat
     playmateData: filledPlaymate,
   });
 
-  const outDir = path.join(os.homedir(), '.openclaw', 'media', 'outbound', 'group-default');
+  const outDir = customOutDir ?? path.join(os.homedir(), '.openclaw', 'media', 'outbound', 'group-default');
   if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
   const outPath = path.join(outDir, `gami-report-${Date.now()}.png`);
@@ -429,4 +429,4 @@ async function generateReport({ reportType, startDay, endDay, userData, orderDat
   return outPath;
 }
 
-module.exports = { generateReport };
+module.exports = { generateReport, generatePeriodIds };
