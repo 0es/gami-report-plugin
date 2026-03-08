@@ -1,4 +1,5 @@
 {
+  "id": "gami-report",
   "name": "gami-report",
   "openclaw": {
     "extensions": ["./index.js"],
