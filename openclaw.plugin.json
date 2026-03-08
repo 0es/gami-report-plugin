@@ -1,10 +1,7 @@
 {
   "id": "gami-report",
   "name": "gami-report",
-  "openclaw": {
-    "extensions": ["./index.js"],
-    "skills": ["./skills"]
-  },
+  "skills": ["./skills"],
   "configSchema": {
     "type": "object",
     "additionalProperties": false,
