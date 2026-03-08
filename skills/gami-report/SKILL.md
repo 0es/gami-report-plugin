@@ -56,21 +56,37 @@ endDay   = 2024-03-08
 Triggered when user asks for "周报" without specifying a custom range.
 
 - `reportType`: `1`
-- `startDay`: Monday of the week that is 7 weeks before the current week
-- `endDay`: Sunday of the current week (or today if the week is not yet complete)
+- `startDay`: Monday of the ISO week that is 7 weeks before the current ISO week
+- `endDay`: today
+
+**ISO 8601 week rules (important):**
+- A week always starts on **Monday** and ends on Sunday.
+- The first ISO week of a year (`W01`) is the week containing the **first Thursday** of that year (equivalently, the week containing January 4th).
+- Consequence: the last few days of December may belong to **W01 of the next year**, and the first few days of January may belong to **W52 or W53 of the previous year**.
 
 Date computation:
-```
-currentWeekMonday = most recent Monday on or before today
-startDay = currentWeekMonday - 49 days  (7 weeks back)
-endDay   = today
+```js
+// 1. Find Monday of the current ISO week
+const day = today.getDay();                     // 0=Sun … 6=Sat
+const diff = (day === 0) ? -6 : 1 - day;       // shift so Monday = 0
+const currentWeekMonday = today + diff days;
+
+// 2. Go back 7 full ISO weeks to get startDay
+startDay = currentWeekMonday - 49 days;
+endDay   = today;
 ```
 
-Example — today is 2024-03-08 (Friday), current week Monday = 2024-03-04:
+Example — today is 2024-03-08 (Friday), current ISO week Monday = 2024-03-04:
 ```
-startDay = 2024-01-15   (7 weeks before 2024-03-04)
+startDay = 2024-01-15   (7 ISO weeks before 2024-03-04)
 endDay   = 2024-03-08
 ```
+
+Year-boundary example — today is 2025-01-02 (Thursday):
+- ISO week of 2025-01-02 is **2025-W01** (Monday = 2024-12-30)
+- currentWeekMonday = 2024-12-30
+- startDay = 2024-12-30 − 49 days = **2024-11-11**
+- endDay = 2025-01-02
 
 ---
 
@@ -155,6 +171,7 @@ User: 发一下2024年1月到2月的月报
 ## Notes
 
 - Always compute dates using today's actual date. Never hard-code date strings.
+- For weekly mode, always use **ISO 8601 weeks** (Monday-first). The `id` field in weekly API responses uses the format `yyyy-Www` (e.g. `2025-W01`), which follows the same standard. Year-boundary weeks (e.g. 2024-12-30 belongs to 2025-W01) must be handled correctly.
 - The image is saved to `~/.openclaw/media/outbound/group-default/`. OpenClaw picks it up automatically for outbound delivery.
 - If the user requests the test environment, pass `env: "test"` to the tool; otherwise omit it (defaults to `"prod"`).
 - The tool fetches all paginated records within the date range automatically.
