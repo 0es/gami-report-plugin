@@ -89,6 +89,8 @@ function mockOrderData(ids) {
       repeatRate:             rndF(0, 0.4),
       successRate:            rndF(0.3, 1.0),
       refundRate:             rndF(0, 0.3),
+      cancelRate:             rndF(0, 0.3),
+      rejectRate:             rndF(0, 0.3),
     };
   });
 }

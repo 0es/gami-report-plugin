@@ -126,7 +126,7 @@ const EMPTY_USER = {
 const EMPTY_ORDER = {
   totalAmount: null, orderCount: null, statusOkCount: null, statusRefundCount: null,
   uniqueSellersCount: null, totalBuyers: null, completedBuyers: null, repeatCompletedBuyers: null,
-  avgAmountPerBuyer: null, repeatRate: null, successRate: null, refundRate: null,
+  avgAmountPerBuyer: null, repeatRate: null, successRate: null, refundRate: null, cancelRate: null, rejectRate: null,
 };
 const EMPTY_PLAYMATE = {
   totalPlaymateNum: null, newPlaymateNum: null, activePlaymateNum: null,
@@ -176,6 +176,8 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
       <td>${pct(r.repeatRate)}</td>
       <td>${pct(r.successRate)}</td>
       <td>${pct(r.refundRate)}</td>
+      <td>${pct(r.cancelRate)}</td>
+      <td>${pct(r.rejectRate)}</td>
     </tr>`).join('');
 
   const playmateRows = playmateData.map(r => `
@@ -287,7 +289,7 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
         <thead><tr>
           <th>日期</th><th>订单总金额</th><th>总订单数</th><th>已完成</th><th>退款/取消</th>
           <th>接单陪玩(去重)</th><th>下单用户(去重)</th><th>有完成订单用户</th><th>复购用户</th>
-          <th>人均下单金额</th><th>复购率</th><th>成单率</th><th>退款率</th>
+          <th>人均下单金额</th><th>复购率</th><th>成单率</th><th>退款率</th><th>取消率</th><th>拒绝率</th>
         </tr></thead>
         <tbody>${orderRows}</tbody>
       </table>
