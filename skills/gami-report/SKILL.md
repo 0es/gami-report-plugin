@@ -6,6 +6,7 @@ description: Generate and send Gami platform statistical report images in four m
 ## Overview
 
 Use this skill when the user asks for a Gami platform data report, statistical summary, or asks the bot to send a report image. This skill calls the `generate_gami_report` tool to fetch live data from the Gami API, renders it as a styled image, and then sends the image as a media message.
+**Important:** report images must be sent via the `message` tool (media/image message). Do not treat a plain text reply as delivery.
 
 ## When to trigger
 
@@ -127,7 +128,7 @@ endDay   = 2024-03-08
 4. Parse the tool result (JSON string in `content[0].text`):
    - On success: `imagePath` is the absolute path to the PNG file.
    - On error: surface the error message to the user.
-5. Send the image file at `imagePath` as a media/image message.
+5. Send the image file at `imagePath` using the `message` tool as a media/image message (required).
 6. Accompany the image with a brief text summary, for example:
    - "已发送日报（2024-02-28 ~ 2024-03-08，共10天），包含用户、订单、陪玩师三类数据。"
 
@@ -173,6 +174,7 @@ User: 发一下2024年1月到2月的月报
 - Always compute dates using today's actual date. Never hard-code date strings.
 - For weekly mode, always use **ISO 8601 weeks** (Monday-first). The `id` field in weekly API responses uses the format `yyyy-Www` (e.g. `2025-W01`), which follows the same standard. Year-boundary weeks (e.g. 2024-12-30 belongs to 2025-W01) must be handled correctly.
 - The image is saved to `~/.openclaw/media/outbound/group-default/`. OpenClaw picks it up automatically for outbound delivery.
+- Sending a report image is only considered complete after calling the `message` tool to deliver the media/image message.
 - If the user requests the test environment, pass `env: "test"` to the tool; otherwise omit it (defaults to `"prod"`).
 - The tool fetches all paginated records within the date range automatically.
 - If there is no data for the requested period, the tool returns a message instead of an image path — surface that to the user.

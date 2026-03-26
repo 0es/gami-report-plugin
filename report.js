@@ -231,8 +231,8 @@ function buildHtml({ reportType, startDay, endDay, userData, orderData, playmate
       padding-left: 12px;
       margin-bottom: 12px;
     }
-    .table-wrap { overflow-x: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    table { width: 100%; border-collapse: collapse; background: #fff; font-size: 12px; }
+    .table-wrap { overflow-x: auto; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); background: #fff; }
+    table { width: max-content; min-width: 100%; border-collapse: collapse; background: #fff; font-size: 12px; }
     thead th {
       background: #1a73e8; color: #fff;
       padding: 10px 12px; border: 1px solid #1558b0;
@@ -383,7 +383,8 @@ async function generateReport({ reportType, startDay, endDay, userData, orderDat
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   try {
     const page = await browser.newPage();
-    await page.setViewport({ width: 1200, height: 900 });
+    // Wider viewport prevents multi-column tables (especially order data) from being cut off.
+    await page.setViewport({ width: 2200, height: 1300 });
     await page.setContent(html, { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 2500));
     await page.screenshot({ path: outPath, fullPage: true });
