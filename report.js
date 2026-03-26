@@ -383,8 +383,7 @@ async function generateReport({ reportType, startDay, endDay, userData, orderDat
   const browser = await puppeteer.launch({ args: ['--no-sandbox', '--disable-setuid-sandbox'] });
   try {
     const page = await browser.newPage();
-    // Wider viewport prevents multi-column tables (especially order data) from being cut off.
-    await page.setViewport({ width: 2200, height: 1300 });
+    await page.setViewport({ width: 1300, height: 1300 });
     await page.setContent(html, { waitUntil: 'networkidle0' });
     await new Promise(resolve => setTimeout(resolve, 2500));
     await page.screenshot({ path: outPath, fullPage: true });
